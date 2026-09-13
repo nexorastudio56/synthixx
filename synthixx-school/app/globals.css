@@ -1,0 +1,537 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Synthixx design tokens — warm, clean, minimal. Monochrome accent.
+   =========================================================================== */
+:root {
+  --background: #faf9f6;
+  --surface: #ffffff;
+  --foreground: #1f1d1a;
+  --muted: #6b665f;
+  --border: #e7e3da;
+  --accent: #1f1d1a;
+  --accent-fg: #ffffff;
+  --accent-soft: #eceae3;
+  --danger: #b91c1c;
+  --radius: 0.75rem;
+
+  /* SVG diagram tokens (light) — used inside AI-generated ```svg blocks */
+  --surface-0: #faf9f6;
+  --surface-1: #ffffff;
+  --surface-2: #f4f4f2;
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --border-accent: rgba(0, 191, 165, 0.3);
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #8a8a8a;
+  --text-accent: #085041;
+  --bg-accent: rgba(0, 191, 165, 0.08);
+}
+
+.dark {
+  --background: #1a1815;
+  --surface: #232019;
+  --foreground: #f2efe9;
+  --muted: #a8a299;
+  --border: #34302a;
+  --accent: #f2efe9;
+  --accent-fg: #1a1815;
+  --accent-soft: #322e27;
+  --danger: #f87171;
+
+  /* SVG diagram tokens (dark) */
+  --surface-0: #0f0f0f;
+  --surface-1: #1a1a1a;
+  --surface-2: #242424;
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(0, 191, 165, 0.3);
+  --text-primary: #f0f0f0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #6a6a6a;
+  --text-accent: #00bfa5;
+  --bg-accent: rgba(0, 191, 165, 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
+  --radius-card: var(--radius);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin, unobtrusive scrollbars to match the clean aesthetic. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+/* Claude-style editorial serif for message reading text. */
+.message-serif {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  letter-spacing: -0.003em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Markdown rendering inside chat bubbles. */
+.prose-jwad {
+  line-height: 1.75;
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.prose-jwad p {
+  margin: 0.5rem 0;
+}
+.prose-jwad ul,
+.prose-jwad ol {
+  margin: 0.5rem 0;
+  padding-left: 1.4rem;
+}
+.prose-jwad ul {
+  list-style: disc;
+}
+.prose-jwad ol {
+  list-style: decimal;
+}
+.prose-jwad li {
+  margin: 0.25rem 0;
+}
+.prose-jwad h1,
+.prose-jwad h2,
+.prose-jwad h3 {
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+  line-height: 1.3;
+}
+.prose-jwad h1 {
+  font-size: 1.4rem;
+}
+.prose-jwad h2 {
+  font-size: 1.2rem;
+}
+.prose-jwad h3 {
+  font-size: 1.05rem;
+}
+.prose-jwad a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.prose-jwad code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85em;
+  background: var(--accent-soft);
+  color: var(--foreground);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+}
+.prose-jwad pre {
+  background: #0d1117;
+  color: #e6edf3;
+  border-radius: 0.6rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+.prose-jwad pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: 0.85rem;
+}
+.prose-jwad blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted);
+  margin: 0.5rem 0;
+}
+.prose-jwad table {
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.prose-jwad th,
+.prose-jwad td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.prose-jwad img,
+.prose-jwad svg,
+.prose-jwad iframe,
+.prose-jwad video {
+  max-width: 100%;
+  height: auto;
+}
+
+@keyframes jwad-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+.jwad-caret {
+  display: inline-block;
+  width: 0.5rem;
+  height: 1rem;
+  background: var(--accent);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: jwad-blink 1s steps(2) infinite;
+}
+
+/* ---- Composer (chat input) polish ---- */
+.jwad-composer {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.jwad-composer:focus-within {
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 6px 20px rgba(0, 0, 0, 0.06);
+}
+.jwad-send {
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 65%, #000 0%)
+  );
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.jwad-send:not(:disabled):hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.jwad-send:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* ---- Animated brand ---- */
+.jwad-orb {
+  border-radius: 30%;
+  transition: filter 0.3s ease, transform 0.3s ease;
+  animation: jwad-orb-idle 3.5s ease-in-out infinite;
+}
+@keyframes jwad-orb-idle {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px rgba(45, 212, 191, 0.25));
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(45, 212, 191, 0.45));
+    transform: scale(1.03) rotate(1.5deg);
+  }
+}
+@keyframes jwad-orb-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(45, 212, 191, 0));
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(45, 212, 191, 0.85));
+    transform: scale(1.08) rotate(-3deg);
+  }
+}
+.jwad-orb--active {
+  animation: jwad-orb-pulse 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jwad-orb,
+  .jwad-orb--active {
+    animation: none;
+  }
+}
+
+@keyframes jwad-shimmer-move {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+.jwad-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--accent) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: jwad-shimmer-move 2s linear infinite;
+}
+
+.jwad-wordmark {
+  /* Monochrome, theme-aware to match the Iso Cube mark. */
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Animated spark inside the brand mark (Gemini/Claude-style twinkle). */
+@keyframes jwad-spark-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(8deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+@keyframes jwad-spark-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+.jwad-spark {
+  animation: jwad-spark-spin 6s ease-in-out infinite;
+}
+.jwad-spark-mini {
+  animation: jwad-spark-twinkle 2.4s ease-in-out infinite;
+}
+.jwad-orb--active .jwad-spark {
+  animation: jwad-spark-spin 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jwad-spark,
+  .jwad-spark-mini {
+    animation: none;
+  }
+}
+
+/* Animated "thinking" dots used during streaming. */
+@keyframes jwad-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes stream-cursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+.jwad-dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: jwad-dot 1.2s infinite ease-in-out;
+}
+.jwad-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.jwad-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Landing page gradient mesh background. */
+.jwad-mesh {
+  background:
+    radial-gradient(40% 40% at 15% 20%, rgba(31, 29, 26, 0.08), transparent 70%),
+    radial-gradient(40% 40% at 85% 15%, rgba(31, 29, 26, 0.06), transparent 70%),
+    radial-gradient(45% 45% at 50% 90%, rgba(31, 29, 26, 0.06), transparent 70%);
+}
+@keyframes jwad-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.jwad-float {
+  animation: jwad-float 6s ease-in-out infinite;
+}
+
+/* ===========================================================================
+   School agent motion system (CSS-only, theme-aware, reduced-motion safe)
+   =========================================================================== */
+@keyframes sk-fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sk-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes sk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sk-slide-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sk-grow-y {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.sk-animate-fade-up { animation: sk-fade-in-up 0.4s ease-out both; }
+.sk-animate-scale-in { animation: sk-scale-in 0.18s ease-out both; }
+.sk-animate-fade-in { animation: sk-fade-in 0.25s ease-out both; }
+.sk-animate-slide-up { animation: sk-slide-in-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Stagger: children enter one after another (auto nth-child delays). */
+.sk-stagger > * {
+  animation: sk-fade-in-up 0.4s ease-out both;
+}
+.sk-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.sk-stagger > *:nth-child(2) { animation-delay: 55ms; }
+.sk-stagger > *:nth-child(3) { animation-delay: 110ms; }
+.sk-stagger > *:nth-child(4) { animation-delay: 165ms; }
+.sk-stagger > *:nth-child(5) { animation-delay: 220ms; }
+.sk-stagger > *:nth-child(6) { animation-delay: 275ms; }
+.sk-stagger > *:nth-child(7) { animation-delay: 330ms; }
+.sk-stagger > *:nth-child(8) { animation-delay: 385ms; }
+.sk-stagger > *:nth-child(n + 9) { animation-delay: 440ms; }
+
+/* Card hover lift used on stat cards / clickable cards. */
+.sk-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.sk-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Button press micro-interaction. */
+.sk-press { transition: transform 0.12s ease, filter 0.12s ease; }
+.sk-press:not(:disabled):active { transform: scale(0.97); }
+
+/* SVG chart draw-in (apply to <path> with a dash set inline). */
+@keyframes sk-draw {
+  to { stroke-dashoffset: 0; }
+}
+.sk-draw { animation: sk-draw 0.9s ease-out forwards; }
+
+/* Donut sweep + bar grow helpers. */
+.sk-grow-bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: sk-grow-y 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Streaming caret for the AI assistant. */
+.sk-caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.5ch;
+  height: 1em;
+  margin-left: 1px;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  animation: jwad-blink 1s steps(2) infinite;
+}
+
+/* Compact density (toggled from command palette). */
+.sk-compact table th,
+.sk-compact table td {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+.sk-compact .sk-card {
+  padding: 0.75rem;
+}
+
+/* AI-generated SVG diagrams (```svg blocks in chat) */
+.jwad-svg {
+  --surface-0: var(--background);
+  --surface-1: var(--surface);
+  --surface-2: var(--accent-soft);
+  --border-strong: color-mix(in srgb, var(--foreground) 16%, transparent);
+  --border-accent: rgba(0, 191, 165, 0.3);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted);
+  --text-muted: color-mix(in srgb, var(--muted) 85%, transparent);
+  --text-accent: #00bfa5;
+  --bg-accent: rgba(0, 191, 165, 0.08);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+.jwad-svg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(520px, 70vh);
+}
+.jwad-svg svg text {
+  font-family: var(--font-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk-animate-fade-up,
+  .sk-animate-scale-in,
+  .sk-animate-fade-in,
+  .sk-animate-slide-up,
+  .sk-stagger > *,
+  .sk-grow-bar,
+  .sk-draw {
+    animation: none !important;
+  }
+  .sk-card:hover { transform: none; }
+}

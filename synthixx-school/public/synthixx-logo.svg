@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 130 130" fill="none" role="img" aria-label="Synthixx logo">
+  <style>
+    .sx-card { fill: #080D0A; }
+    .sx-ring { transform-box: fill-box; transform-origin: center; animation: sx-ring 3s ease-out infinite; }
+    .sx-cube { transform-box: fill-box; transform-origin: center; animation: sx-float 4s ease-in-out infinite; }
+    .sx-face { fill: #00E676; opacity: 0; animation: sx-fade .5s ease forwards, sx-shimmer 4s ease-in-out infinite; }
+    .sx-face.t { animation-delay: 0s, .5s; }
+    .sx-face.r { animation-delay: .18s, .68s; }
+    .sx-face.l { animation-delay: .36s, .86s; }
+    .sx-edge { fill: none; stroke: #00E676; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sx-draw 1s ease forwards; }
+    .sx-inner { fill: none; stroke: #00E676; stroke-width: 1.5; stroke-linecap: round; opacity: .6; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sx-draw 1s ease .4s forwards; }
+    .sx-dot { fill: #00E676; transform-box: fill-box; transform-origin: center; opacity: 0; animation: sx-pop .4s ease 1s forwards; }
+    @keyframes sx-fade { from { opacity: 0; } to { opacity: .3; } }
+    @keyframes sx-shimmer { 0%, 100% { opacity: .22; } 50% { opacity: .38; } }
+    @keyframes sx-draw { to { stroke-dashoffset: 0; } }
+    @keyframes sx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes sx-ring { 0% { transform: scale(.6); opacity: .5; } 70% { opacity: 0; } 100% { transform: scale(1.7); opacity: 0; } }
+    @keyframes sx-pop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .sx-cube, .sx-ring, .sx-face, .sx-edge, .sx-inner, .sx-dot { animation: none; }
+      .sx-face { opacity: .3; } .sx-dot { opacity: 1; } .sx-edge, .sx-inner { stroke-dashoffset: 0; }
+    }
+  </style>
+
+  <rect class="sx-card" x="0" y="0" width="130" height="130" rx="31" />
+
+  <circle class="sx-ring" cx="65" cy="68" r="44" fill="#00E676" opacity="0.18" />
+
+  <g class="sx-cube">
+    <polygon class="sx-face t" points="65,28 100,48 65,68 30,48" />
+    <polygon class="sx-face r" points="100,48 100,88 65,108 65,68" />
+    <polygon class="sx-face l" points="30,48 65,68 65,108 30,88" />
+
+    <polyline class="sx-edge" points="30,48 65,28 100,48 100,88 65,108 30,88 30,48" pathLength="1" />
+
+    <line class="sx-inner" x1="65" y1="68" x2="65" y2="108" pathLength="1" />
+    <line class="sx-inner" x1="30" y1="48" x2="65" y2="68" pathLength="1" />
+    <line class="sx-inner" x1="100" y1="48" x2="65" y2="68" pathLength="1" />
+
+    <circle class="sx-dot" cx="65" cy="28" r="3.5" />
+    <circle class="sx-dot" cx="100" cy="48" r="3.5" />
+    <circle class="sx-dot" cx="30" cy="48" r="3.5" />
+  </g>
+</svg>

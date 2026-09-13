@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 130 130" fill="none">
+  <style>
+    .card { fill: #1a1815; }
+    .mark { stroke: #f2efe9; }
+    .markfill { fill: #f2efe9; }
+    @media (prefers-color-scheme: light) {
+      .card { fill: #f2f2f0; }
+      .mark { stroke: #111111; }
+      .markfill { fill: #111111; }
+    }
+  </style>
+  <rect class="card" x="0" y="0" width="130" height="130" rx="31" />
+  <polygon class="markfill" points="65,28 100,48 65,68 30,48" opacity="0.30" />
+  <polygon class="markfill" points="100,48 100,88 65,108 65,68" opacity="0.20" />
+  <polygon class="markfill" points="30,48 65,68 65,108 30,88" opacity="0.25" />
+  <polyline class="mark" points="30,48 65,28 100,48 100,88 65,108 30,88 30,48" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+  <line class="mark" x1="65" y1="68" x2="65" y2="108" stroke-width="2" opacity="0.7" />
+  <line class="mark" x1="30" y1="48" x2="65" y2="68" stroke-width="2" opacity="0.7" />
+  <line class="mark" x1="100" y1="48" x2="65" y2="68" stroke-width="2" opacity="0.7" />
+  <circle class="markfill" cx="65" cy="28" r="3.5" />
+  <circle class="markfill" cx="100" cy="48" r="3.5" />
+  <circle class="markfill" cx="30" cy="48" r="3.5" />
+</svg>

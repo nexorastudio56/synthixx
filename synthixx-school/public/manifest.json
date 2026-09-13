@@ -1,0 +1,18 @@
+{
+  "name": "SchoolAI by Synthixx",
+  "short_name": "SchoolAI",
+  "description": "School management portal — fees, attendance, results and more.",
+  "start_url": "/school",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
