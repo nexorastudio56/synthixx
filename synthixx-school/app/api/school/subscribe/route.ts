@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/server";
-import { cashmaalConfigured, cashmaalFormFields, CASHMAAL_PAY_URL, CASHMAAL_CURRENCY } from "@/lib/school/cashmaal";
 
 export const runtime = "nodejs";
 
-const VALID_PLANS = ["test", "starter", "growth", "enterprise"];
+const VALID_PLANS = ["starter", "growth", "enterprise"];
 const PLAN_PRICES: Record<string, number> = {
-  test: 100,
   starter: 5000,
   growth: 12000,
   enterprise: 25000,
 };
+
+const VALID_METHODS = ["jazzcash", "easypaisa", "nayapay", "bank"];
 
 export async function POST(req: Request) {
   try {
@@ -31,55 +31,50 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Only admins can manage subscriptions" }, { status: 403 });
     }
 
-    if (!cashmaalConfigured()) {
-      return NextResponse.json({ error: "CashMaal is not configured. Set CASHMAAL_WEB_ID in environment variables." }, { status: 503 });
-    }
-
     const body = await req.json().catch(() => ({}));
-    const planId = typeof body?.planId === "string" ? body.planId : "";
-    const planName = typeof body?.planName === "string" ? body.planName : planId;
+    const planId       = typeof body?.planId       === "string" ? body.planId.trim()       : "";
+    const planName     = typeof body?.planName     === "string" ? body.planName.trim()     : planId;
+    const paymentMethod = typeof body?.paymentMethod === "string" ? body.paymentMethod.trim() : "";
+    const transactionId = typeof body?.transactionId === "string" ? body.transactionId.trim() : "";
 
-    if (!VALID_PLANS.includes(planId)) {
+    if (!VALID_PLANS.includes(planId))
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
-    }
 
-    const amount = PLAN_PRICES[planId];
+    if (!VALID_METHODS.includes(paymentMethod))
+      return NextResponse.json({ error: "Invalid payment method" }, { status: 400 });
+
+    if (!transactionId)
+      return NextResponse.json({ error: "Transaction ID required" }, { status: 400 });
+
+    const amount   = PLAN_PRICES[planId];
     const schoolId = (member as { school_id?: string } | null)?.school_id ?? "unknown";
-    const orderId = `SUB${Date.now()}${Math.floor(Math.random() * 1000)}`;
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://school.synthixx.com";
+    const ref      = `SUB${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
-    // Save payment attempt so IPN can find it and activate subscription
+    // Save pending subscription payment
     await svc.from("fee_payments").insert({
-      school_id: schoolId,
-      gateway: "cashmaal",
-      txn_ref: orderId,
-      gateway_order_id: orderId,
+      school_id:        schoolId,
+      gateway:          paymentMethod,
+      txn_ref:          ref,
+      gateway_order_id: transactionId,
       amount,
-      status: "pending",
-      currency: "PKR",
-      payer_email: user.email ?? null,
-      raw: { type: "subscription", planId, planName },
+      status:           "processing",
+      currency:         "PKR",
+      payer_email:      user.email ?? null,
+      payment_method:   paymentMethod,
+      raw: {
+        type:          "subscription",
+        planId,
+        planName,
+        transactionId,
+        submittedAt:   new Date().toISOString(),
+      },
       initiated_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      updated_at:   new Date().toISOString(),
     });
 
-    const fields = cashmaalFormFields({
-      amount,
-      currency: CASHMAAL_CURRENCY,
-      orderId,
-      clientEmail: user.email ?? null,
-      successUrl: `${baseUrl}/school/subscription?status=success&ref=${orderId}`,
-      cancelUrl: `${baseUrl}/school/subscription?status=cancelled`,
-      addiInfo: `Synthixx Campus ${planName} Plan — ${schoolId}`,
-    });
+    console.log(`[Subscribe] Pending: plan=${planId} method=${paymentMethod} txn=${transactionId} school=${schoolId}`);
 
-    return NextResponse.json({
-      action: CASHMAAL_PAY_URL,
-      method: "POST",
-      fields,
-      orderId,
-      amount,
-    });
+    return NextResponse.json({ success: true, ref });
   } catch (e) {
     console.error("[Subscribe]", e);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
