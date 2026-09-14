@@ -48,6 +48,21 @@ export async function POST(req: Request) {
     const orderId = `SUB${Date.now()}${Math.floor(Math.random() * 1000)}`;
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://school.synthixx.com";
 
+    // Save payment attempt so IPN can find it and activate subscription
+    await svc.from("fee_payments").insert({
+      school_id: schoolId,
+      gateway: "cashmaal",
+      txn_ref: orderId,
+      gateway_order_id: orderId,
+      amount,
+      status: "pending",
+      currency: "PKR",
+      payer_email: user.email ?? null,
+      raw: { type: "subscription", planId, planName },
+      initiated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
     const fields = cashmaalFormFields({
       amount,
       currency: CASHMAAL_CURRENCY,

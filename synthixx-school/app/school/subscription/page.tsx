@@ -140,6 +140,25 @@ function SubscriptionView() {
         description="Manage your Synthixx Campus subscription. Payments are processed via CashMaal."
       />
 
+      {/* Payment return status */}
+      {(() => {
+        if (typeof window === "undefined") return null;
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get("status");
+        if (status === "success") return (
+          <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+            <p className="font-semibold">Payment received! Subscription is being activated.</p>
+            <p className="mt-1 opacity-80">Ref: {params.get("ref") ?? "—"} — refresh in a few seconds.</p>
+          </div>
+        );
+        if (status === "cancelled") return (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <p className="font-semibold">Payment cancelled. No charge was made.</p>
+          </div>
+        );
+        return null;
+      })()}
+
       <div className="mb-6 rounded-xl border border-border bg-surface p-4 text-sm">
         <p className="font-medium">Current Plan: <span className="text-accent">Free Trial</span></p>
         <p className="mt-1 text-muted">Upgrade to unlock all features for your institution.</p>

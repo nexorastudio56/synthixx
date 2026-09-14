@@ -109,8 +109,45 @@ export async function finalizeCashmaalPayment(
     gatewayTransactionId: cmTid ?? null,
     paymentMethod: attempt.payment_method ?? null,
   });
-  if (paid) await insertFeePaidNotification(attempt);
+  if (!paid) return "paid";
+
+  const raw = attempt.raw as { type?: string; planId?: string } | null;
+  if (raw?.type === "subscription" && raw.planId && attempt.school_id) {
+    await activateSubscription(attempt.school_id, raw.planId, attempt.amount, orderId);
+  } else {
+    await insertFeePaidNotification(attempt);
+  }
   return "paid";
+}
+
+async function activateSubscription(
+  schoolId: string,
+  planId: string,
+  amount: number | string,
+  orderId: string,
+): Promise<void> {
+  try {
+    const svc = createServiceClient();
+    const now = new Date();
+    const expiresAt = new Date(now);
+    expiresAt.setMonth(expiresAt.getMonth() + 1);
+
+    await svc.from("school_subscriptions").upsert({
+      school_id: schoolId,
+      plan_id: planId,
+      status: "active",
+      amount: Number(amount),
+      gateway: "cashmaal",
+      gateway_order_id: orderId,
+      activated_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      updated_at: now.toISOString(),
+    }, { onConflict: "school_id" });
+
+    console.log(`[CashMaal] Subscription activated: school=${schoolId} plan=${planId}`);
+  } catch (e) {
+    console.error("[CashMaal] Failed to activate subscription", e);
+  }
 }
 
 async function insertFeePaidNotification(attempt: {
