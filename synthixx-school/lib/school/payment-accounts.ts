@@ -1,13 +1,13 @@
 export const PAYMENT_ACCOUNTS = {
   jazzcash: {
     label: "JazzCash",
-    number: "0315-5837433",
+    number: "0315-5827433",
     title: "Jawad Zaheer Kyani",
     instructions: "JazzCash app kholein → Send Money → Mobile Number → amount enter karein → Transfer karein → T-ID copy karein",
   },
   easypaisa: {
     label: "EasyPaisa",
-    number: "0315-5837433",
+    number: "0315-5827433",
     title: "Jawad Zaheer Kyani",
     instructions: "EasyPaisa app kholein → Send Money → Mobile Number → amount enter karein → Transfer karein → T-ID copy karein",
   },

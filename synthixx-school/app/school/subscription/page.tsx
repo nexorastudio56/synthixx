@@ -59,11 +59,50 @@ const PLANS = [
 type Plan = typeof PLANS[number];
 type Step = "plans" | "checkout" | "success";
 
-const METHOD_ICONS: Record<PaymentMethodKey, string> = {
-  jazzcash:  "🟡",
-  easypaisa: "🟢",
-  nayapay:   "🔵",
-  bank:      "🏦",
+function JazzCashLogo({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="8" fill="#E31E26"/>
+      <text x="50%" y="55%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="10" fontWeight="800" fontFamily="Arial,sans-serif">Jazz</text>
+      <text x="50%" y="78%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="7" fontWeight="600" fontFamily="Arial,sans-serif">Cash</text>
+    </svg>
+  );
+}
+function EasyPaisaLogo({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="8" fill="#00A651"/>
+      <circle cx="20" cy="17" r="6" fill="white" opacity="0.9"/>
+      <rect x="10" y="26" width="20" height="3" rx="1.5" fill="white" opacity="0.9"/>
+      <text x="50%" y="92%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="5.5" fontWeight="700" fontFamily="Arial,sans-serif">easypaisa</text>
+    </svg>
+  );
+}
+function NayaPayLogo({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="8" fill="#5B2D8E"/>
+      <text x="50%" y="48%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="9" fontWeight="800" fontFamily="Arial,sans-serif">Naya</text>
+      <text x="50%" y="72%" dominantBaseline="middle" textAnchor="middle" fill="#C89EF0" fontSize="8" fontWeight="700" fontFamily="Arial,sans-serif">Pay</text>
+    </svg>
+  );
+}
+function AlliedBankLogo({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="8" fill="#8B0000"/>
+      <rect x="8" y="22" width="24" height="3" rx="1" fill="white"/>
+      <polygon points="20,8 28,22 12,22" fill="white" opacity="0.9"/>
+      <text x="50%" y="90%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="5" fontWeight="700" fontFamily="Arial,sans-serif">Allied Bank</text>
+    </svg>
+  );
+}
+
+const METHOD_LOGO: Record<PaymentMethodKey, React.ReactNode> = {
+  jazzcash:  <JazzCashLogo size={36} />,
+  easypaisa: <EasyPaisaLogo size={36} />,
+  nayapay:   <NayaPayLogo size={36} />,
+  bank:      <AlliedBankLogo size={36} />,
 };
 
 function SubscriptionView() {
@@ -169,14 +208,14 @@ function SubscriptionView() {
             <button
               key={key}
               onClick={() => setMethod(key)}
-              className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 text-sm font-medium transition ${
+              className={`flex flex-col items-center gap-2 rounded-xl border-2 p-3.5 text-sm font-medium transition ${
                 method === key
-                  ? "border-accent bg-accent text-white"
-                  : "border-border bg-surface text-foreground hover:border-muted"
+                  ? "border-accent shadow-md scale-[1.03]"
+                  : "border-border bg-surface hover:border-muted hover:shadow-sm"
               }`}
             >
-              <span className="text-xl">{METHOD_ICONS[key]}</span>
-              <span className="text-xs">{PAYMENT_ACCOUNTS[key].label}</span>
+              {METHOD_LOGO[key]}
+              <span className="text-xs font-semibold text-foreground">{PAYMENT_ACCOUNTS[key].label}</span>
             </button>
           ))}
         </div>
@@ -184,9 +223,10 @@ function SubscriptionView() {
         {/* Account details card */}
         <div className="mb-6 rounded-2xl border border-border bg-surface overflow-hidden">
           <div className="border-b border-border bg-accent-soft px-4 py-3">
-            <p className="text-sm font-semibold text-foreground">
-              {METHOD_ICONS[method]} {acc.label} Account Details
-            </p>
+            <div className="flex items-center gap-2.5">
+              {METHOD_LOGO[method]}
+              <p className="text-sm font-semibold text-foreground">{acc.label} Account Details</p>
+            </div>
           </div>
           <div className="divide-y divide-border">
             {/* Account title */}
@@ -373,7 +413,7 @@ function SubscriptionView() {
       </div>
 
       <div className="mt-6 rounded-xl border border-border bg-surface p-4 text-center text-sm text-muted">
-        <p>Payment methods: 🟡 JazzCash &nbsp;·&nbsp; 🟢 EasyPaisa &nbsp;·&nbsp; 🔵 NayaPay &nbsp;·&nbsp; 🏦 Allied Bank</p>
+        <p>Payment methods: JazzCash &nbsp;·&nbsp; EasyPaisa &nbsp;·&nbsp; NayaPay &nbsp;·&nbsp; Allied Bank</p>
         <p className="mt-1">Har payment <strong>12 ghante</strong> mein manually verify hoti hai. Questions? <a href="mailto:support@synthixx.com" className="text-accent underline">support@synthixx.com</a></p>
       </div>
     </div>
