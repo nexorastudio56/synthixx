@@ -1,3 +1,4 @@
+// Landing page — school.synthixx.com
 import Link from "next/link";
 import {
   GraduationCap,

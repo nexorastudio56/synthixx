@@ -8,10 +8,7 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   async redirects() {
-    return [
-      // The dashboard lives under /school; send the bare domain there.
-      { source: "/", destination: "/school", permanent: false },
-    ];
+    return [];
   },
 };
 
