@@ -15,6 +15,24 @@ export default function SubscriptionPage() {
 
 const PLANS = [
   {
+    id: "test",
+    name: "Test Plan",
+    price: 10,
+    period: "/ one-time",
+    icon: <Zap className="h-6 w-6" />,
+    color: "text-orange-500",
+    bg: "bg-orange-50 dark:bg-orange-950/30",
+    border: "border-orange-300 dark:border-orange-700",
+    description: "Test payment flow only. Remove after testing.",
+    features: [
+      "Rs. 10 test transaction",
+      "Verifies CashMaal works",
+      "Remove after testing",
+    ],
+    popular: false,
+    testOnly: true,
+  },
+  {
     id: "starter",
     name: "Starter",
     price: 5000,
@@ -138,6 +156,11 @@ function SubscriptionView() {
                 Most Popular
               </span>
             )}
+            {"testOnly" in plan && plan.testOnly && (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-500 px-3 py-0.5 text-xs font-semibold text-white">
+                Test Only
+              </span>
+            )}
 
             <div className={`mb-4 inline-flex rounded-xl p-2.5 ${plan.bg}`}>
               <span className={plan.color}>{plan.icon}</span>
@@ -169,7 +192,11 @@ function SubscriptionView() {
                   : "border border-border bg-background hover:bg-accent-soft"
               }`}
             >
-              {paying === plan.id ? "Redirecting to CashMaal…" : `Subscribe — Rs. ${plan.price.toLocaleString()}/mo`}
+              {paying === plan.id
+                ? "Redirecting to CashMaal…"
+                : ("testOnly" in plan && plan.testOnly)
+                  ? `Test Payment — Rs. ${plan.price}`
+                  : `Subscribe — Rs. ${plan.price.toLocaleString()}/mo`}
             </button>
           </div>
         ))}

@@ -5,8 +5,9 @@ import { cashmaalConfigured, cashmaalFormFields, CASHMAAL_PAY_URL, CASHMAAL_CURR
 
 export const runtime = "nodejs";
 
-const VALID_PLANS = ["starter", "growth", "enterprise"];
+const VALID_PLANS = ["test", "starter", "growth", "enterprise"];
 const PLAN_PRICES: Record<string, number> = {
+  test: 10,
   starter: 5000,
   growth: 12000,
   enterprise: 25000,

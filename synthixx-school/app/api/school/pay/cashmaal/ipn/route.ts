@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
   if (!webId) return new Response("web_id not configured", { status: 500 });
 
   const log = (msg: string) => console.log(`[CashMaal IPN] ${msg}`);
-  const ack = (msg: string) => { log(msg); return new Response("ok", { status: 200 }); };
+  // CashMaal requires the literal string "OK" (uppercase) to stop retrying.
+  const ack = (msg: string) => { log(msg); return new Response("OK", { status: 200 }); };
 
   // ── web_id ──────────────────────────────────────────────────────────────
   if (fields.web_id !== webId) return ack("web_id mismatch");
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  log(`paid: order=${orderId} CM_TID=${fields.CM_TID || ""} amount=${amount} fee=${fields.fee || "0"}`);
   await finalizeCashmaalPayment(orderId, (fields.CM_TID || "").trim() || null, fields);
   return ack("paid");
 }
