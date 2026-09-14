@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Check, Zap, Building2, GraduationCap,
   ArrowLeft, Copy, CheckCircle2, Clock, ChevronRight,
+  ShieldCheck, AlertCircle, RefreshCw,
 } from "lucide-react";
 import { ModuleGuard } from "@/components/school/guard";
 import { PageHeader, useToast } from "@/components/school/ui";
+import { useSchool } from "@/components/school/school-provider";
 import { PAYMENT_ACCOUNTS, type PaymentMethodKey } from "@/lib/school/payment-accounts";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SubscriptionPage() {
   return (
@@ -377,9 +380,15 @@ function SubscriptionView() {
         description="Choose a plan that fits your institution. Payments verified within 12 hours."
       />
 
+      {/* Active subscription status */}
+      <ActiveSubscriptionBanner />
+
+      {/* Admin: pending payments to verify */}
+      <PendingSubscriptions onActivated={() => {}} />
+
       <div className="mb-6 rounded-xl border border-border bg-surface p-4 text-sm">
-        <p className="font-medium text-foreground">Current Plan: <span className="text-accent">Free Trial</span></p>
-        <p className="mt-1 text-muted">Upgrade to unlock all features. Pay via JazzCash, EasyPaisa, NayaPay, or Allied Bank.</p>
+        <p className="font-medium text-foreground">Upgrade Plan</p>
+        <p className="mt-1 text-muted">Pay via JazzCash, EasyPaisa, NayaPay, or Allied Bank. Activated within 12 hours.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -444,6 +453,166 @@ function SubscriptionView() {
           All payments are manually verified within 12 hours. Questions?{" "}
           <a href="mailto:support@synthixx.com" className="text-accent underline underline-offset-2">support@synthixx.com</a>
         </p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Active Subscription Banner ─────────────────────────────────────── */
+
+function ActiveSubscriptionBanner() {
+  const { schoolId } = useSchool();
+  const [sub, setSub] = useState<{ plan_id: string; status: string; expires_at: string } | null>(null);
+
+  useEffect(() => {
+    if (!schoolId) return;
+    const svc = createClient();
+    svc.from("school_subscriptions")
+      .select("plan_id,status,expires_at")
+      .eq("school_id", schoolId)
+      .eq("status", "active")
+      .maybeSingle()
+      .then(({ data }) => setSub(data as typeof sub));
+  }, [schoolId]);
+
+  if (!sub) return null;
+
+  const planLabel = sub.plan_id.charAt(0).toUpperCase() + sub.plan_id.slice(1);
+  const expires = new Date(sub.expires_at).toLocaleDateString("en-PK", { day: "numeric", month: "long", year: "numeric" });
+
+  return (
+    <div className="mb-6 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-600" />
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-emerald-800">Active Subscription — {planLabel} Plan</p>
+        <p className="text-xs text-emerald-700">Renews on {expires}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Pending Subscriptions (Admin) ───────────────────────────────────── */
+
+type PendingPayment = {
+  txn_ref: string;
+  amount: number;
+  gateway: string;
+  initiated_at: string;
+  raw: { planId?: string; planName?: string; transactionId?: string };
+};
+
+function PendingSubscriptions({ onActivated }: { onActivated: () => void }) {
+  const { schoolId } = useSchool();
+  const { show } = useToast();
+  const [items, setItems]         = useState<PendingPayment[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [activating, setActivating] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!schoolId) return;
+    setLoading(true);
+    const svc = createClient();
+    const { data } = await svc
+      .from("fee_payments")
+      .select("txn_ref,amount,gateway,initiated_at,raw")
+      .eq("school_id", schoolId)
+      .eq("status", "processing")
+      .order("initiated_at", { ascending: false });
+
+    const subs = ((data ?? []) as PendingPayment[]).filter(
+      (r) => (r.raw as { type?: string })?.type === "subscription"
+    );
+    setItems(subs);
+    setLoading(false);
+  }, [schoolId]);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function activate(txnRef: string) {
+    setActivating(txnRef);
+    try {
+      const res  = await fetch("/api/school/admin/activate-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ txnRef }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error ?? "Activation failed");
+      show(`Subscription activated — ${data.planId} plan`, "success");
+      await load();
+      onActivated();
+    } catch (e) {
+      show(e instanceof Error ? e.message : "Error", "error");
+    } finally {
+      setActivating(null);
+    }
+  }
+
+  if (loading || items.length === 0) return null;
+
+  const GATEWAY_LABEL: Record<string, string> = {
+    jazzcash: "JazzCash", easypaisa: "EasyPaisa",
+    nayapay: "NayaPay", bank: "Allied Bank",
+  };
+
+  return (
+    <div className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-amber-200 px-5 py-3.5">
+        <div className="flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <p className="text-sm font-semibold text-amber-800">
+            {items.length} Pending Subscription{items.length > 1 ? "s" : ""} — Awaiting Verification
+          </p>
+        </div>
+        <button onClick={load} className="text-amber-600 hover:text-amber-800 transition">
+          <RefreshCw className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Payment rows */}
+      <div className="divide-y divide-amber-200">
+        {items.map((p) => {
+          const planName = p.raw?.planName ?? p.raw?.planId ?? "—";
+          const txnId    = p.raw?.transactionId ?? "—";
+          const gateway  = GATEWAY_LABEL[p.gateway] ?? p.gateway;
+          const date     = new Date(p.initiated_at).toLocaleString("en-PK");
+
+          return (
+            <div key={p.txn_ref} className="flex items-center gap-4 px-5 py-4">
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                    {planName} Plan
+                  </span>
+                  <span className="text-sm font-bold text-foreground">
+                    Rs. {Number(p.amount).toLocaleString()}
+                  </span>
+                  <span className="text-xs text-muted">{gateway}</span>
+                </div>
+                <p className="mt-1 text-xs text-muted">
+                  T-ID: <span className="font-mono font-semibold text-foreground">{txnId}</span>
+                </p>
+                <p className="text-xs text-muted">{date}</p>
+              </div>
+
+              {/* Activate button */}
+              <button
+                onClick={() => activate(p.txn_ref)}
+                disabled={activating === p.txn_ref}
+                className="flex flex-shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                {activating === p.txn_ref ? "Activating…" : "Activate"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="border-t border-amber-200 bg-amber-100/60 px-5 py-2.5 text-xs text-amber-700">
+        Verify the Transaction ID in your JazzCash / EasyPaisa / NayaPay / Bank app before activating.
       </div>
     </div>
   );
