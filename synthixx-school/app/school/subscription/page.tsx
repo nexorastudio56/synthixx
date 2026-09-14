@@ -17,7 +17,7 @@ const PLANS = [
   {
     id: "test",
     name: "Test Plan",
-    price: 10,
+    price: 100,
     period: "/ one-time",
     icon: <Zap className="h-6 w-6" />,
     color: "text-orange-500",
@@ -25,7 +25,7 @@ const PLANS = [
     border: "border-orange-300 dark:border-orange-700",
     description: "Test payment flow only. Remove after testing.",
     features: [
-      "Rs. 10 test transaction",
+      "Rs. 100 test transaction",
       "Verifies CashMaal works",
       "Remove after testing",
     ],

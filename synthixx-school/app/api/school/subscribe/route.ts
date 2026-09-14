@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 const VALID_PLANS = ["test", "starter", "growth", "enterprise"];
 const PLAN_PRICES: Record<string, number> = {
-  test: 10,
+  test: 100,
   starter: 5000,
   growth: 12000,
   enterprise: 25000,
