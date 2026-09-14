@@ -145,7 +145,7 @@ function SubscriptionView() {
         <p className="mt-1 text-muted">Upgrade to unlock all features for your institution.</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {PLANS.map((plan) => (
           <div
             key={plan.id}
